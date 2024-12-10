@@ -6,6 +6,7 @@ use Exception;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -57,9 +58,6 @@ class UserController extends Controller
             }
             $token = $user->createToken('authToken')->plainTextToken;
             return response()->json(["status" => "success", "message" => "User Login Sucessfully", "token" => $token, "role" => $user->role]);
-
-
-            return "all good";
         }catch(Exception $ex){
             return response()->json(["status" => "fail", "message"=> $ex->getMessage()]);
         }
@@ -102,4 +100,24 @@ class UserController extends Controller
 
 
 
+
+
+
+
+
+
+    public function dashboard(Request $request)
+    {
+        try{
+         // You can return the dashboard view or some data here
+         if(Auth::check()){
+          return "Dashbord";
+         }
+         return redirect()->route('login');
+       
+
+        }catch(Exception $ex){
+            return response()->json(["status" => "fail", "message" => $ex->getMessage()]);
+        }
+    }
 }

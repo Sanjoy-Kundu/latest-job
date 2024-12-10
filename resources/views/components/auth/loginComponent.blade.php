@@ -26,9 +26,9 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{{asset('backend')}}/js/sb-admin-2.min.js"></script>
-    <script src="{{asset('backend')}}/js/axios.js"></script>
-    <script src="{{asset('backend')}}/js/sweet_alert.js"></script>
-    <script src="{{asset('backend')}}/js/config.js"></script>
+    <script src="{{asset('common_custom')}}/js/axios.js"></script>
+    <script src="{{asset('common_custom')}}/js/sweet_alert.js"></script>
+    <script src="{{asset('common_custom')}}/js/config.js"></script>
 
 </head>
 
@@ -55,6 +55,7 @@
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back! TalentHub</h1>
                                     </div>
                                     <section class="">
+                                        <div id="success_message" class="alert alert-success d-none"></div>
                                         <div class="form-group">
                                             <label for="email">Email Or Mobile</label>
                                             <input type="text" class="form-control" id="email_or_mobile"
@@ -63,19 +64,15 @@
                                             <small id="email_or_mobile_error" class="form-text  text-danger"></small>
                                         </div>
 
-
-
                                         <div class="form-group">
                                             <label for="password">Password</label>
                                             <input type="password" class="form-control myPassword"
-                                                id="password"name="password" aria-describedby="password"
+                                                id="password" name="password" aria-describedby="password"
                                                 placeholder="Enter your password">
                                             <small id="password_error"
                                                 class="form-text text-danger passowrdAndConfrimPasswordError"></small>
                                             <input type="checkbox" onclick="togglePassword('password')">Show Password
-
                                         </div>
-
 
                                         <button class="btn btn-primary w-100" onclick="onLogin()">Login</button>
                                         <hr>
@@ -117,114 +114,56 @@
             }
         }
 
-        function onLogin(){
+        async function onLogin() {
             document.getElementById("email_or_mobile_error").innerText = "";
             document.getElementById("password_error").innerText = "";
-            let email_or_email =    document.getElementById("email_or_mobile").value;
-            let password =     document.getElementById("password").value;
+            let email_or_email = document.getElementById("email_or_mobile").value;
+            let password = document.getElementById("password").value;
             let isError = false;
 
-            if(!email_or_email){
-                 document.getElementById("email_or_mobile_error").innerText = "Input field is required";
-                 isError = true;
+            if (!email_or_email) {
+                document.getElementById("email_or_mobile_error").innerText = "Input field is required";
+                isError = true;
             }
 
-            if(!password){
+            if (!password) {
                 document.getElementById("password_error").innerText = "Password is required";
                 isError = true;
             }
 
-            if(isError) return 
+            if (isError) return;
 
             let data = {
-                email_or_mobile:email_or_email,
-                password:password
+                email_or_mobile: email_or_email,
+                password: password
             }
-            console.log(data)
+            try {
+                let res = await axios.post("/user-login", data);
+                if (res.data.status === "success") {
+                    document.getElementById("success_message").innerText = res.data.message;
+                    document.getElementById("success_message").classList.remove("d-none");
 
-                
+                    // Set the token in localStorage and axios default headers
+                    setToken(res.data.token);
 
-
-        }
-        
-/*
-    async function onLogin() {
-        try {
-
-            document.getElementById("email_or_mobile_error").innerText = "";
-            document.getElementById("password_error").innerText = "";
-
-            let email_or_mobile = document.getElementById("email_or_mobile").value.trim();
-            let password = document.getElementById("password").value.trim();
-
-
-            let hasError = false;
-
-            if (!email_or_mobile) {
-                document.getElementById("email_or_mobile_error").innerText = "Input is required.";
-                hasError = true;
-            }
-            if (!password) {
-                document.getElementById("password_error").innerText = "Password is required.";
-                hasError = true;
-            } else if (password.length < 8) {
-                document.getElementById("password_error").innerText = "Passwords length must be 8 characters or more.";
-                hasError = true
-            }
-
-
-            if (hasError) return;
-
-
-            let data = {
-                email_or_mobile: email_or_mobile,
-                password: password,
-            };
-
-            let response = await axios.post("/user-login", data,{
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    //content type ki hobe
-                },
-            });
-
-            if (response.data.status === "success") {
-                Swal.fire({
-                    position: "center",
-                    icon: "success",
-                    title: response.data.message,
-                    showConfirmButton: false,
-                    timer: 1000
-                });
-                // error clear    
-                document.getElementById("email_or_mobile_error").innerText = "";
-                document.getElementById("password_error").innerText = "";
-                //value clear
-                document.getElementById("email_or_mobile").value = "";
-                document.getElementById("password").value = "";
-                
-                //set token
-                let token = response.data.token
-                localStorage.setItem("token", token);
-                console.log(localStorage.setItem("token", token));
-                window.location.href="/dashboard"
-               
-                
-
-            } else if (response.data.status === "error") {
-
-                let message = response.data.message;
-                if (message === "Your email or mobile does not exists.") {
-                    document.getElementById("email_or_mobile_error").innerText = message;
-                } else if (message === "Password is incorrect.") {
-                    document.getElementById("password_error").innerText = message;
+                    // Redirect to the dashboard
+                    window.location.href = "/dashboard";
+                } else {
+                    // If login fails, show error message
+                    document.getElementById("email_or_mobile_error").innerText = res.data.message;
                 }
+
+            } catch (error) {
+                console.error("An error occurred:", error);
+                document.getElementById("email_or_mobile_error").innerText = "An error occurred during login.";
             }
-        } catch (error) {
-            console.error("Error occurred:", error);
         }
-    }
-*/
+
+        // Function to store the token in localStorage and axios defaults
+        // function setToken(token) {
+        //     localStorage.setItem('token', `Bearer ${token}`);
+        //     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        // }
     </script>
 </body>
 

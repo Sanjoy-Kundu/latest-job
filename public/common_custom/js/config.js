@@ -1,13 +1,23 @@
 
 
-// function setToken(token){
-//     localStorage.setItem("token", `Bearer ${token}`);
-// }
+function setToken(token){
+    localStorage.setItem("token", `Bearer ${token}`);
+}
 
-// function getToken(){
-//     return localStorage.getItem("token");
-// }
+function getToken(){
+    return localStorage.getItem("token");
+}
 
+
+
+function headerToken(){
+    let token = getToken(); // Get the token from localStorage
+    return {
+        headers: {
+            Authorization: token
+        }
+    };
+}
 // function HeaderToken(){
 //     let token = getToken();
 //     return {

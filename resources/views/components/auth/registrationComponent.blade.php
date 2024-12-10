@@ -56,7 +56,7 @@
                                         <h1 class="h4 text-gray-900 mb-4">Welcome To! TalentHub</h1>
                                     </div>
                                     <section class="">
-                                        <div id="success_message" class="alert alert-success d-none">Successfully</div>
+                                        <div id="success_message" class="alert alert-success d-none"></div>
                                         <div class="form-group">
                                             <label for="name">Your Name</label>
                                             <input type="text" class="form-control" id="name" name="name"
