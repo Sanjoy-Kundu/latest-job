@@ -32,15 +32,44 @@ class UserController extends Controller
 
 
 
+    public function login(Request $request){
+        try{
+            $validator = Validator::make($request->all(),[
+                "email_or_mobile" => "required|max:225",
+                "password" => "required|string|min:8",
+            ]);
+            if($validator->fails()){
+                return response()->json(["status" => "error", "errors" => $validator->errors()]);
+            }
+            
+            $fieldType = filter_var($request->email_or_mobile, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
+            $user = User::where($fieldType, $request->email_or_mobile)->first();
+
+            $email_or_mobile = trim($request->email_or_mobile);
+            $password = trim($request->password);
+            
+            if(!$user){
+                return response()->json(["status" => "error", "message" => "email or phone does not exists"]);
+            }
+
+            if(!Hash::check($password, $user->password)){
+                return response()->json(["status" => "error", "message"=>"Password does't exists"]);
+            }
+            $token = $user->createToken('authToken')->plainTextToken;
+            return response()->json(["status" => "success", "message" => "User Login Sucessfully", "token" => $token, "role" => $user->role]);
+
+
+            return "all good";
+        }catch(Exception $ex){
+            return response()->json(["status" => "fail", "message"=> $ex->getMessage()]);
+        }
+    }
+
+
+
+
     public function registration(Request $request){
         try{
-        //    $request->validate([
-        //     "name" => "required|string|max:255",
-        //     "email" => "required|email|unique:users,email",
-        //     "mobile" => "required|digits:11|unique:users,mobile",
-        //     "password" => "required|string|min:8|confirmed",
-        //    ]);
-
         $validator = Validator::make($request->all(), [
            "name" => "required|string|max:255",
            "email" => "required|email|unique:users,email",
@@ -72,11 +101,5 @@ class UserController extends Controller
     }
 
 
-    public function login(Request $request){
-        try{
-            return "im login";
-        }catch(Exception $ex){
-            return response()->json(["status" => "fail", "message"=>$ex->getMessage()]);
-        }
-    }
+
 }

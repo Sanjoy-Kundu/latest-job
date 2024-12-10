@@ -117,6 +117,35 @@
             }
         }
 
+        function onLogin(){
+            document.getElementById("email_or_mobile_error").innerText = "";
+            document.getElementById("password_error").innerText = "";
+            let email_or_email =    document.getElementById("email_or_mobile").value;
+            let password =     document.getElementById("password").value;
+            let isError = false;
+
+            if(!email_or_email){
+                 document.getElementById("email_or_mobile_error").innerText = "Input field is required";
+                 isError = true;
+            }
+
+            if(!password){
+                document.getElementById("password_error").innerText = "Password is required";
+                isError = true;
+            }
+
+            if(isError) return 
+
+            let data = {
+                email_or_mobile:email_or_email,
+                password:password
+            }
+            console.log(data)
+
+                
+
+
+        }
         
 /*
     async function onLogin() {
